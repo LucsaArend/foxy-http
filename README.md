@@ -1,5 +1,9 @@
 # foxy-http
 
+## About Package
+Hey,
+This is my first package, I'm still learning. Feel free to suggest improvements
+
 ## Installation
 
 Router is available via Composer:
