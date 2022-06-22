@@ -11,13 +11,27 @@ Router is available via Composer:
 ```bash
 "lucasarend/http-fox": "^1.0"
 ```
-
 or run
-
 ```bash
 composer require lucasarend/http-fox
 ```
 
+## Documentation
+### Create Class
+```php
+<?php
+
+use LucasArend\HttpFox\HttpFox;
+
+$http = new HttpFox();
+```
+
+### Simple Get Page
+```php
+$http->getURL('https://www.blogger.com/about/?hl=pt-br');
+//Write Page Return
+echo $http->response;
+```
 
 ## License
 
