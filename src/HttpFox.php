@@ -51,6 +51,28 @@ class HttpFox
         return $this->responseText;
     }
 
+    /* Return the remote file size in bytes */
+    /* $unit suport KB MB GB */
+    public function get_file_size($url,$unit = null)
+    {
+        curl_setopt($this->ch, CURLOPT_URL,$url);
+        curl_setopt($this->ch, CURLOPT_NOBODY, TRUE);
+        curl_exec($this->ch);
+        $file_size = curl_getinfo($this->ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        curl_setopt($this->ch, CURLOPT_NOBODY, FALSE);
+        $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        switch ($unit) {
+            case 'KB':
+                return $file_size / 1024;
+            case 'MB':
+                return $file_size / 1024 / 1024;
+            case 'GB':
+                return $file_size / 1024 / 1024 / 1024;
+            default:
+                return $file_size;
+        }
+    }
+
     public function enableResponseHeader($prBoolean = true)
     {
         if ($prBoolean) {
