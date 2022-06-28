@@ -10,6 +10,8 @@ class HttpFox
 
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0';
 
+    private $headers;
+
     public function __construct()
     {
         $this->ch = curl_init();
@@ -91,6 +93,11 @@ class HttpFox
     public function setHeader($prHeader, $prValue)
     {
         curl_setopt($this->ch, $prHeader, $prValue);
+    }
+
+    /* @param  $prHeader array */
+    public function setHeaders($prHeader) {
+        curl_setopt($this->ch, CURLOPT_HTTPHEADER, $prHeader);
     }
 
     public function enableVerbose()
