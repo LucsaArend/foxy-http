@@ -45,6 +45,9 @@ class HttpFox
     public function sendPost($prURL,$prData){
         curl_setopt($this->ch, CURLOPT_URL,$prURL);
         curl_setopt($this->ch, CURLOPT_POST, 1);
+        if (is_array($prData)) {
+            $prData = http_build_query($prData);
+        }
         curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
 
         $this->responseText = curl_exec($this->ch);
