@@ -17,6 +17,12 @@ class HttpFox
         $this->ch = curl_init();
         $this->cookie = 'cookie.txt';
         curl_setopt($this->ch, CURLOPT_HEADER, 0);
+        curl_setopt($this->ch, CURLOPT_ENCODING , "gzip");
+    }
+
+    public function setEncoding($prEncode)
+    {
+        curl_setopt($this->ch, CURLOPT_ENCODING , $prEncode);
     }
 
     public function setProxy($prHost = '127.0.0.1',$prPort = 8888,$prUser,$prPassworld)
