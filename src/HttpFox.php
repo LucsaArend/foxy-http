@@ -25,10 +25,10 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_ENCODING , $prEncode);
     }
 
-    public function setProxy($prHost = '127.0.0.1',$prPort = 8888,$prUser,$prPassworld)
+    public function setProxy($prHost = '127.0.0.1',$prPort = 8888,$prUser = null,$prPassworld = null)
     {
         curl_setopt($this->ch, CURLOPT_PROXY, $prHost . ':'. $prPort);
-        if (isset($prUser) && isset($prPassworld)) {
+        if (!is_null($prUser) && !is_null($prPassworld)) {
             curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $prUser . ':' . $prPassworld);
         }
     }
