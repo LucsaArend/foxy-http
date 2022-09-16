@@ -63,6 +63,14 @@ class HttpFox
         return $this->responseText;
     }
 
+    public function sendPUT($prURL, $prData)
+    {
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        $result = $this->sendPost($prURL,$prData);
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        return $result;
+    }
+
     /* Return the remote file size in bytes */
     /* $unit suport KB MB GB */
     public function get_file_size($url,$unit = null)
