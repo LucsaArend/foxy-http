@@ -70,6 +70,14 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
         return $result;
     }
+	
+	public function sendDELETE($prURL, $prData)
+    {
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        $result = $this->sendPost($prURL,$prData);
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        return $result;
+    }
 
     /* Return the remote file size in bytes */
     /* $unit suport KB MB GB */
