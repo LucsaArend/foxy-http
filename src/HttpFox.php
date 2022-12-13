@@ -39,6 +39,8 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+
+        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookie);
         curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookie);
 
         curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
@@ -55,7 +57,11 @@ class HttpFox
         if (is_array($prData)) {
             $prData = http_build_query($prData);
         }
+        curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
+
+        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookie);
+        curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookie);
 
         $this->responseText = curl_exec($this->ch);
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
@@ -124,6 +130,10 @@ class HttpFox
     /* @param  $prHeader array */
     public function setHeaders($prHeader) {
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $prHeader);
+    }
+
+    public function setUserAgent($prUserAgent){
+        $this->userAgent = $prUserAgent;
     }
 
     public function enableVerbose()
