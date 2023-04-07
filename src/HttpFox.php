@@ -4,49 +4,57 @@ namespace LucasArend\HttpFox;
 
 class HttpFox
 {
-    public $statusCode = null;
-
-    private $verbose = null;
-
+    private $ch;
+    private $statusCode;
+    private $responseText;
+    private $verbose;
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0';
-
     private $headers;
+    private $cookieFile = 'cookie.txt';
 
-    public function __construct()
+    public function __construct($ch = null)
     {
-        $this->ch = curl_init();
-        $this->cookie = 'cookie.txt';
+        if ($ch) {
+          $this->ch = $ch;
+        } else {
+          $this->ch = curl_init();
+        }
+
         curl_setopt($this->ch, CURLOPT_HEADER, 0);
         curl_setopt($this->ch, CURLOPT_ENCODING , "gzip");
+        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);
+        curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieFile);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
     }
 
-    public function setEncoding($prEncode)
+
+    public function setEncoding($encoding)
     {
-        curl_setopt($this->ch, CURLOPT_ENCODING , $prEncode);
+        curl_setopt($this->ch, CURLOPT_ENCODING, $encoding);
     }
 
-    public function setProxy($prHost = '127.0.0.1',$prPort = 8888,$prUser = null,$prPassworld = null)
+    public function setProxy($host = '127.0.0.1', $port = 8888, $user = null, $password = null)
     {
-        curl_setopt($this->ch, CURLOPT_PROXY, $prHost . ':'. $prPort);
-        if (!is_null($prUser) && !is_null($prPassworld)) {
-            curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $prUser . ':' . $prPassworld);
+        curl_setopt($this->ch, CURLOPT_PROXY, $host . ':' . $port);
+        if ($user && $password) {
+          curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $user . ':' . $password);
         }
     }
 
     public function getURL($url)
     {
-        curl_setopt($this->ch, CURLOPT_URL,$url);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
-
-        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookie);
-        curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookie);
-
-        curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
+        curl_setopt($this->ch, CURLOPT_URL, $url);
 
         $this->responseText = curl_exec($this->ch);
+
+        if ($this->responseText === false) {
+          throw new \Exception('Curl error: ' . curl_error($this->ch));
+        }
+
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+
         return $this->responseText;
     }
 
@@ -109,11 +117,7 @@ class HttpFox
 
     public function enableResponseHeader($prBoolean = true)
     {
-        if ($prBoolean) {
-            curl_setopt($this->ch, CURLOPT_HEADER, 1);
-        } else {
-            curl_setopt($this->ch, CURLOPT_HEADER, 0);
-        }
+      curl_setopt($this->ch, CURLOPT_HEADER, $prBoolean);
     }
 
     public function disableSSL($prBool = false)

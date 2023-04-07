@@ -55,6 +55,15 @@ $http->getURL('https://www.blogger.com/about/?hl=pt-br');
 //Write Page Return
 echo $http->response;
 ```
+
+#### Response headers
+```php
+$httpFox = new HttpFox();
+$httpFox->enableResponseHeader(); //Enable response headers
+
+$httpFox->enableResponseHeader(false); // Disable response headers
+```
+
 ## License
 
 The MIT License (MIT). Please see [License File](https://github.com/LucsaArend/foxy-http/blob/main/LICENSE) for more information.
