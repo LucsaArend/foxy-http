@@ -68,8 +68,8 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
 
-        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookie);
-        curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookie);
+        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);
+        curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookieFile);
 
         $this->responseText = curl_exec($this->ch);
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
