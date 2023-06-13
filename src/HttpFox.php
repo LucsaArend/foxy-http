@@ -20,6 +20,11 @@ class HttpFox
           $this->ch = curl_init();
         }
 
+        $multCrawler = getenv('HTTP_MULTI_CRAWLER') ?? false;
+        if ($multCrawler) {
+            $this->cookieFile = rand(1,99999) . date('Yd-m-Y-H-i-s') . '-cookie.txt';
+        }
+
         curl_setopt($this->ch, CURLOPT_HEADER, 0);
         curl_setopt($this->ch, CURLOPT_ENCODING , "gzip");
         curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);

@@ -17,6 +17,12 @@ composer require lucasarend/http-fox
 ```
 
 ## Documentation
+### MultCrawler
+If you intend to use it for multiple crawlers or simultaneous requests that require cookies, set this option in your .env file.
+```php
+HTTP_MULTI_CRAWLER=true
+```
+
 ### Create Class
 ```php
 <?php
@@ -29,6 +35,14 @@ $http = new HttpFox();
 ### Simple Get Page
 ```php
 $http->getURL('https://www.blogger.com/about/?hl=pt-br');
+//Write Page Return
+echo $http->response;
+```
+
+### Simple Post
+```php
+$postData = 'name=Lucas';
+$http->sendPost('https://www.blogger.com/about/?hl=pt-br',$postData);
 //Write Page Return
 echo $http->response;
 ```
