@@ -33,7 +33,15 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
     }
-
+    /* The cookie is expected to be a json in the following format */
+    /* {"cookie1": "value1", "cookie2": "value2"} */
+    public function setCookiesByJson($jsonCookies) {
+        $cookieString = '';
+        foreach ($jsonCookies as $name => $value) {
+            $cookieString .= $name . '=' . $value . '; ';
+        }
+        curl_setopt($this->ch, CURLOPT_COOKIE, rtrim($cookieString, '; '));
+    }
 
     public function setEncoding($encoding)
     {
