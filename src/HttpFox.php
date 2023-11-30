@@ -164,4 +164,9 @@ class HttpFox
         return $this->verbose;
     }
 
+    public function setTimeOut($prTimeOutInSeconds = 60)
+    {
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
+    }
+
 }
