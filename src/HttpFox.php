@@ -8,7 +8,7 @@ class HttpFox
     public $verbose;
     private $responseText;
     private $ch;
-    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0';
+    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0';
     private $headers;
     private $cookieFile = 'cookie.txt';
 
@@ -152,7 +152,12 @@ class HttpFox
     public function setUserAgent($prUserAgent){
         $this->userAgent = $prUserAgent;
     }
-
+    /**
+     * Enables verbose output for cURL operations. This will output detailed information about the
+     * cURL transfer to STDERR.
+     *
+     * @return void
+     */
     public function enableVerbose()
     {
         curl_setopt($this->ch, CURLOPT_VERBOSE, true);
@@ -163,10 +168,42 @@ class HttpFox
     {
         return $this->verbose;
     }
-
+    /**
+     * Sets the request timeout in seconds.
+     *
+     * @param int $prTimeOutInSeconds Timeout duration in seconds. Default value is 60.
+     *
+     * @return void
+     */
     public function setTimeOut($prTimeOutInSeconds = 60)
     {
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
+    }
+    /**
+     * Function to set a PFX certificate for a cURL resource.
+     *
+     * @param string $pfxPath Path to the PFX certificate file.
+     * @param string $pfxPassword Password to access the PFX certificate.
+     */
+    public function setPFX($pfxPath,$pfxPassword)
+    {
+        curl_setopt($this->ch, CURLOPT_SSLCERT, $pfxPath);
+        curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, 'P12');
+        curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pfxPassword);
+    }
+    /**
+     * Function to set a PEM certificate for a cURL resource.
+     *
+     * @param string $pfxPath Path to the PEM certificate file.
+     * @param string $pfxPassword Password to access the PEM certificate.
+     */
+    public function setPEM($pemPath,$pemPassword = null)
+    {
+        curl_setopt($this->ch, CURLOPT_SSLCERT, $pemPath);
+        curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, 'PEM');
+        if (!is_null($pemPassword)) {
+            curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pemPassword);
+        }
     }
 
 }
