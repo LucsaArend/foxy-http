@@ -163,6 +163,11 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_VERBOSE, true);
         curl_setopt($this->ch, CURLOPT_STDERR, $this->verbose);
     }
+    public function disableVerbose()
+    {
+        curl_setopt($this->ch, CURLOPT_VERBOSE, false);
+        curl_setopt($this->ch, CURLOPT_STDERR, $this->verbose);
+    }
 
     public function getVerbose()
     {
@@ -177,6 +182,7 @@ class HttpFox
      */
     public function setTimeOut($prTimeOutInSeconds = 60)
     {
+        curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
     }
     /**
