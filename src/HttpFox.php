@@ -91,9 +91,9 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookieFile);
 
         $this->responseText = curl_exec($this->ch);
+        $this->checkErros();
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
         curl_setopt($this->ch, CURLOPT_POST, 0);
-        $this->checkErros();
         return $this->responseText;
     }
 
