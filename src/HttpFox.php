@@ -2,6 +2,8 @@
 
 namespace LucasArend\HttpFox;
 
+use Exception;
+
 class HttpFox
 {
     public $statusCode;
@@ -11,6 +13,8 @@ class HttpFox
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0';
     private $headers;
     private $cookieFile = 'cookie.txt';
+    public $error = false;
+    public $errorMessage = '';
 
     public function __construct($ch = null)
     {
@@ -68,6 +72,8 @@ class HttpFox
 
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
 
+        $this->checkErros();
+
         return $this->responseText;
     }
 
@@ -87,6 +93,7 @@ class HttpFox
         $this->responseText = curl_exec($this->ch);
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
         curl_setopt($this->ch, CURLOPT_POST, 0);
+        $this->checkErros();
         return $this->responseText;
     }
 
@@ -95,6 +102,7 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PUT");
         $result = $this->sendPost($prURL,$prData);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        $this->checkErros();
         return $result;
     }
 	
@@ -103,6 +111,7 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         $result = $this->sendPost($prURL,$prData);
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        $this->checkErros();
         return $result;
     }
 
@@ -191,11 +200,19 @@ class HttpFox
      * @param string $pfxPath Path to the PFX certificate file.
      * @param string $pfxPassword Password to access the PFX certificate.
      */
-    public function setPFX($pfxPath,$pfxPassword)
+    public function setPFX($pfxPath,$pfxPassword,$pfxSSLCerType = 'P12')
     {
         curl_setopt($this->ch, CURLOPT_SSLCERT, $pfxPath);
-        curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, 'P12');
+        curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, $pfxSSLCerType);
         curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pfxPassword);
+
+        $this->error = curl_errno($this->ch);
+        $this->errorMessage = curl_error($this->ch);
+
+        if ($this->error) {
+            // Handle potential errors here, e.g., logging, throwing exceptions
+            throw new Exception("Error setting PFX: $this->errorMessage");
+        }
     }
     /**
      * Function to set a PEM certificate for a cURL resource.
@@ -209,6 +226,15 @@ class HttpFox
         curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, 'PEM');
         if (!is_null($pemPassword)) {
             curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pemPassword);
+        }
+    }
+
+    private function checkErros() {
+        $this->error = curl_errno($this->ch);
+        $this->errorMessage = curl_error($this->ch);
+
+        if ($this->error) {
+            throw new Exception("HttpFox Error: $this->errorMessage");
         }
     }
 
