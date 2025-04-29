@@ -153,7 +153,13 @@ class HttpFox
         curl_setopt($this->ch, $prHeader, $prValue);
     }
 
-    /* @param  $prHeader array */
+    /**
+     * Sets the headers for the cURL request.
+     *
+     * @param array $prHeader An array of strings, where each item is a complete header in the format "Name: Value".
+     *                        Example: ["Content-Type: application/json", "Authorization: Basic <base64>"]
+     * @return void
+     */
     public function setHeaders($prHeader) {
         curl_setopt($this->ch, CURLOPT_HTTPHEADER, $prHeader);
     }
