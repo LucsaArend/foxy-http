@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  php74:
+    image: ghcr.io/devgine/composer-php:v2-php7.4-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "composer install && ./vendor/bin/phpunit --configuration=/app/phpunit.xml"
+
+  php81:
+    image: ghcr.io/devgine/composer-php:v2-php8.1-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "composer install && ./vendor/bin/phpunit --configuration=/app/phpunit.xml"
+
+  php82:
+    image: ghcr.io/devgine/composer-php:v2-php8.2-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "composer install && ./vendor/bin/phpunit --configuration=/app/phpunit.xml"
+
+  php83:
+    image: ghcr.io/devgine/composer-php:v2-php8.3-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "composer install && ./vendor/bin/phpunit --configuration=/app/phpunit.xml"
+
+  php84:
+    image: ghcr.io/devgine/composer-php:v2-php8.4-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: sh -c "composer install && ./vendor/bin/phpunit --configuration=/app/phpunit.xml"
