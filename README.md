@@ -6,7 +6,7 @@
 
 ## Features
 
-✅ Easy GET, POST, PUT, and DELETE requests  
+✅ Easy GET, POST, PUT, PATCH and DELETE requests  
 ✅ Built-in cookie management with optional file storage  
 ✅ Custom User-Agent support  
 ✅ Proxy support (with or without authentication)  
