@@ -115,6 +115,15 @@ class HttpFox
         return $result;
     }
 
+    public function sendPATCH($prURL, $prData)
+    {
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        $result = $this->sendPost($prURL, $prData);
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        $this->checkErros();
+        return $result;
+    }
+
     /* Return the remote file size in bytes */
     /* $unit suport KB MB GB */
     public function get_file_size($url,$unit = null)
