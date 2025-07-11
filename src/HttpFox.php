@@ -10,8 +10,10 @@ class HttpFox
     public $verbose;
     private $responseText;
     private $ch;
-    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0';
+    private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:136.0) Gecko/20100101 Firefox/136.0';
     private $headers;
+    private $cookieDir;
+    private $useCookieFile = true;
     private $cookieFile = 'cookie.txt';
     public $error = false;
     public $errorMessage = '';
@@ -25,17 +27,26 @@ class HttpFox
         }
 
         $multCrawler = getenv('HTTP_MULTI_CRAWLER') ?? false;
-        if ($multCrawler) {
-            $this->cookieFile = rand(1,99999) . date('Yd-m-Y-H-i-s') . '-cookie.txt';
+        if ($multCrawler && $this->useCookieFile) {
+            $cookieName = rand(1,99999) . '-' . date('Ymd-His') . '-cookie.txt';
+            $cookieDir = $this->cookieDir ?? sys_get_temp_dir();
+            $this->cookieFile = $cookieDir . DIRECTORY_SEPARATOR . $cookieName;
+        } elseif ($this->useCookieFile) {
+            $cookieDir = $this->cookieDir ?? sys_get_temp_dir();
+            $cookieName = 'cookie-' . date('Ymd-His') . '.txt';
+            $this->cookieFile = $cookieDir . DIRECTORY_SEPARATOR . $cookieName;
         }
 
         curl_setopt($this->ch, CURLOPT_HEADER, 0);
         curl_setopt($this->ch, CURLOPT_ENCODING , "gzip");
-        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);
-        curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieFile);
         curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($this->ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
+        curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieFile);
+        if ($this->useCookieFile && isset($this->cookieFile)) {
+            curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);
+            curl_setopt($this->ch, CURLOPT_COOKIEJAR, $this->cookieFile);
+        }
     }
     /* The cookie is expected to be a json in the following format */
     /* {"cookie1": "value1", "cookie2": "value2"} */
@@ -45,6 +56,27 @@ class HttpFox
             $cookieString .= $name . '=' . $value . '; ';
         }
         curl_setopt($this->ch, CURLOPT_COOKIE, rtrim($cookieString, '; '));
+    }
+    /**
+     * Sets the directory where cookie files will be stored
+     * @param string|null $path where cookies will be stored. If null, uses sys_get_temp_dir().
+     */
+    public function setCookiePath($path = null)
+    {
+        if ($path === null) {
+            $this->cookieDir = sys_get_temp_dir();
+        } else {
+            $this->cookieDir = rtrim($path, DIRECTORY_SEPARATOR);
+        }
+    }
+
+    /**
+     * Enable or disable the use of cookie files. If disabled, cookies are stored only in memory.
+     * @param bool $useFile
+     */
+    public function useCookieFile($useFile = true)
+    {
+        $this->useCookieFile = $useFile;
     }
 
     public function setEncoding($encoding)
@@ -86,9 +118,6 @@ class HttpFox
         }
         curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
         curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
-
-        curl_setopt($this->ch, CURLOPT_COOKIEFILE, $this->cookieFile);
-        curl_setopt($this->ch, CURLOPT_COOKIEJAR,$this->cookieFile);
 
         $this->responseText = curl_exec($this->ch);
         $this->checkErros();
@@ -207,7 +236,16 @@ class HttpFox
     public function setTimeOut($prTimeOutInSeconds = 60)
     {
         curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
-        curl_setopt($this->ch, CURLOPT_TIMEOUT, $prTimeOutInSeconds);
+    }
+    public function setConnectTimeout($seconds = 10)
+    {
+        curl_setopt($this->ch, CURLOPT_CONNECTTIMEOUT, $seconds);
+    }
+
+    public function setLowSpeedLimit($bytesPerSecond, $seconds)
+    {
+        curl_setopt($this->ch, CURLOPT_LOW_SPEED_LIMIT, $bytesPerSecond);
+        curl_setopt($this->ch, CURLOPT_LOW_SPEED_TIME, $seconds);
     }
     /**
      * Function to set a PFX certificate for a cURL resource.
@@ -217,6 +255,10 @@ class HttpFox
      */
     public function setPFX($pfxPath,$pfxPassword,$pfxSSLCerType = 'P12')
     {
+        if (!file_exists($pfxPath)) {
+            throw new Exception("PFX file not found: $pfxPath");
+        }
+
         curl_setopt($this->ch, CURLOPT_SSLCERT, $pfxPath);
         curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, $pfxSSLCerType);
         curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pfxPassword);
@@ -251,6 +293,18 @@ class HttpFox
         if ($this->error) {
             throw new Exception("HttpFox Error: $this->errorMessage");
         }
+    }
+
+    public function close()
+    {
+        if ($this->ch) {
+            curl_close($this->ch);
+        }
+    }
+
+    public function __destruct()
+    {
+        $this->close();
     }
 
 }
