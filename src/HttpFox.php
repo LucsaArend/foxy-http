@@ -21,9 +21,9 @@ class HttpFox
     public function __construct($ch = null)
     {
         if ($ch) {
-            $this->ch = $ch;
+          $this->ch = $ch;
         } else {
-            $this->ch = curl_init();
+          $this->ch = curl_init();
         }
 
         $multCrawler = getenv('HTTP_MULTI_CRAWLER') ?? false;
@@ -88,7 +88,7 @@ class HttpFox
     {
         curl_setopt($this->ch, CURLOPT_PROXY, $host . ':' . $port);
         if ($user && $password) {
-            curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $user . ':' . $password);
+          curl_setopt($this->ch, CURLOPT_PROXYUSERPWD, $user . ':' . $password);
         }
     }
 
@@ -99,7 +99,7 @@ class HttpFox
         $this->responseText = curl_exec($this->ch);
 
         if ($this->responseText === false) {
-            throw new \Exception('Curl error: ' . curl_error($this->ch));
+          throw new \Exception('Curl error: ' . curl_error($this->ch));
         }
 
         $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
@@ -134,8 +134,8 @@ class HttpFox
         $this->checkErros();
         return $result;
     }
-
-    public function sendDELETE($prURL, $prData)
+	
+	public function sendDELETE($prURL, $prData)
     {
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
         $result = $this->sendPost($prURL,$prData);
@@ -143,7 +143,14 @@ class HttpFox
         $this->checkErros();
         return $result;
     }
-
+    public function sendPATCH($prURL, $prData)
+    {
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        $result = $this->sendPost($prURL, $prData);
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
+        $this->checkErros();
+        return $result;
+    }
     /**
      * Upload file using binary data
      *
@@ -204,7 +211,6 @@ class HttpFox
 
         return $this->responseText;
     }
-
     /* Return the remote file size in bytes */
     /* $unit suport KB MB GB */
     public function get_file_size($url,$unit = null)
@@ -229,7 +235,7 @@ class HttpFox
 
     public function enableResponseHeader($prBoolean = true)
     {
-        curl_setopt($this->ch, CURLOPT_HEADER, $prBoolean);
+      curl_setopt($this->ch, CURLOPT_HEADER, $prBoolean);
     }
 
     public function disableSSL($prBool = false)
