@@ -330,6 +330,35 @@ class HttpFox
         }
     }
     /**
+     * Function to set a PFX certificate (in binary format) for a cURL resource.
+     *
+     * @param string $pfxBinary    Binary content of the PFX certificate.
+     * @param string $pfxPassword  Password to access the PFX certificate.
+     * @param string $pfxSSLCerType Type of the certificate format (default: 'P12').
+     *
+     * @throws Exception If there is an error setting the certificate on the cURL handle.
+     */
+    public function setPFXBinary($pfxBinary, $pfxPassword, $pfxSSLCerType = 'P12')
+    {
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, $pfxBinary);
+        rewind($stream);
+
+        $pfxPath = 'data://application/x-pkcs12;base64,' . base64_encode(stream_get_contents($stream));
+        fclose($stream);
+
+        curl_setopt($this->ch, CURLOPT_SSLCERT, $pfxPath);
+        curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, $pfxSSLCerType);
+        curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pfxPassword);
+
+        $this->error = curl_errno($this->ch);
+        $this->errorMessage = curl_error($this->ch);
+
+        if ($this->error) {
+            throw new Exception("Error setting PFX (binary): $this->errorMessage");
+        }
+    }
+    /**
      * Function to set a PEM certificate for a cURL resource.
      *
      * @param string $pfxPath Path to the PEM certificate file.
