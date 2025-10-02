@@ -340,14 +340,10 @@ class HttpFox
      */
     public function setPFXBinary($pfxBinary, $pfxPassword, $pfxSSLCerType = 'P12')
     {
-        $stream = fopen('php://memory', 'r+');
-        fwrite($stream, $pfxBinary);
-        rewind($stream);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'cert_') . '.p12';
+        file_put_contents($tmpFile, $pfxBinary);
 
-        $pfxPath = 'data://application/x-pkcs12;base64,' . base64_encode(stream_get_contents($stream));
-        fclose($stream);
-
-        curl_setopt($this->ch, CURLOPT_SSLCERT, $pfxPath);
+        curl_setopt($this->ch, CURLOPT_SSLCERT, $tmpFile);
         curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, $pfxSSLCerType);
         curl_setopt($this->ch, CURLOPT_SSLCERTPASSWD, $pfxPassword);
 
