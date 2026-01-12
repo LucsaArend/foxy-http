@@ -109,20 +109,33 @@ class HttpFox
         return $this->responseText;
     }
 
-    public function sendPost($prURL,$prData){
-        curl_setopt($this->ch, CURLOPT_URL,$prURL);
-        curl_setopt($this->ch, CURLOPT_POST, 1);
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
-        if (is_array($prData)) {
-            $prData = http_build_query($prData);
+    private function sendRequest(string $method, string $url, $data = null)
+    {
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+
+        curl_setopt($this->ch, CURLOPT_HTTPGET, false);
+        curl_setopt($this->ch, CURLOPT_POST, false);
+        curl_setopt($this->ch, CURLOPT_NOBODY, false);
+
+        if ($data !== null) {
+            if (is_array($data)) {
+                $data = http_build_query($data);
+            }
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
+        } else {
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, null);
         }
-        curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
-        curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
+
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
 
         $this->responseText = curl_exec($this->ch);
+        $this->statusCode   = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+
         $this->checkErros();
-        $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
-        curl_setopt($this->ch, CURLOPT_POST, 0);
+
         return $this->responseText;
     }
 
@@ -137,11 +150,7 @@ class HttpFox
 	
 	public function sendDELETE($prURL, $prData)
     {
-        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "DELETE");
-        $result = $this->sendPost($prURL,$prData);
-        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, null);
-        $this->checkErros();
-        return $result;
+        return $this->sendRequest('DELETE', $prURL, $prData);
     }
     public function sendPATCH($prURL, $prData)
     {
