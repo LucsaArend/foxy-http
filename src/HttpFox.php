@@ -109,21 +109,12 @@ class HttpFox
         return $this->responseText;
     }
 
-    private function sendRequest(string $method, string $url, $data = null)
-    {
-        curl_setopt($this->ch, CURLOPT_URL, $url);
-
-        curl_setopt($this->ch, CURLOPT_HTTPGET, false);
-        curl_setopt($this->ch, CURLOPT_POST, false);
-        curl_setopt($this->ch, CURLOPT_NOBODY, false);
-
-        if ($data !== null) {
-            if (is_array($data)) {
-                $data = http_build_query($data);
-            }
-            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
-        } else {
-            curl_setopt($this->ch, CURLOPT_POSTFIELDS, null);
+    public function sendPost($prURL,$prData){
+        curl_setopt($this->ch, CURLOPT_URL,$prURL);
+        curl_setopt($this->ch, CURLOPT_POST, 1);
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, 1);
+        if (is_array($prData)) {
+            $prData = http_build_query($prData);
         }
 
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
