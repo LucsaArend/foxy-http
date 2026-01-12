@@ -136,4 +136,30 @@ class HttpFoxTest extends TestCase
         $this->httpFox->getURL('https://www.php.net/');
         $this->assertEquals(200,$this->httpFox->statusCode, 'status code executed without error');
     }
+
+    public function testDeleteWithBody()
+    {
+        $payload = [
+            'id' => 123,
+            'motivo' => 'teste-delete'
+        ];
+
+        $this->httpFox->setHeaders([
+            'Content-Type: application/json'
+        ]);
+
+        $response = $this->httpFox->sendDELETE(
+            'https://httpbin.org/anything',
+            json_encode($payload)
+        );
+
+        $this->assertEquals(200, $this->httpFox->statusCode);
+
+        $json = json_decode($response, true);
+
+        $this->assertEquals('DELETE', $json['method']);
+
+        $this->assertEquals(123, $json['json']['id']);
+        $this->assertEquals('teste-delete', $json['json']['motivo']);
+    }
 }
