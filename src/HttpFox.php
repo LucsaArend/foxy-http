@@ -143,6 +143,41 @@ class HttpFox
     {
         return $this->sendRequest('DELETE', $prURL, $prData);
     }
+
+    private function sendRequest(string $method, string $url, $data = null)
+    {
+        curl_setopt($this->ch, CURLOPT_URL, $url);
+
+        curl_setopt($this->ch, CURLOPT_HTTPGET, false);
+        curl_setopt($this->ch, CURLOPT_POST, false);
+        curl_setopt($this->ch, CURLOPT_NOBODY, false);
+
+        if ($data !== null) {
+            if (is_array($data)) {
+                $data = http_build_query($data);
+            }
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, $data);
+        } else {
+            curl_setopt($this->ch, CURLOPT_POSTFIELDS, null);
+        }
+        curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
+
+        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+
+        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
+
+        $this->responseText = curl_exec($this->ch);
+        $this->statusCode   = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+
+        $this->checkErros();
+        $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        curl_setopt($this->ch, CURLOPT_POST, 0);
+
+        return $this->responseText;
+    }
+
     public function sendPATCH($prURL, $prData)
     {
         curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, "PATCH");
