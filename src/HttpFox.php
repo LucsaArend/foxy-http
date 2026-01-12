@@ -116,17 +116,13 @@ class HttpFox
         if (is_array($prData)) {
             $prData = http_build_query($prData);
         }
-
-        curl_setopt($this->ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
-
-        curl_setopt($this->ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->ch, CURLOPT_USERAGENT, $this->userAgent);
+        curl_setopt($this->ch, CURLOPT_USERAGENT,$this->userAgent);
+        curl_setopt($this->ch, CURLOPT_POSTFIELDS,$prData);
 
         $this->responseText = curl_exec($this->ch);
-        $this->statusCode   = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
-
         $this->checkErros();
-
+        $this->statusCode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
+        curl_setopt($this->ch, CURLOPT_POST, 0);
         return $this->responseText;
     }
 
